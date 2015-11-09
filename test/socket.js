@@ -211,6 +211,64 @@ test('socket will close and timeout', function t(assert) {
     });
 });
 
+test('continues time-based queue flushing after socket timeout', function t(assert) {
+    var server = UDPServer({ port: PORT }, function onBound() {
+        var sock = new EphemeralSocket({
+            host: 'localhost',
+            port: PORT,
+            socket_timeout: 10,
+            packetQueue: { flush: 10 }
+        });
+
+        server.once('message', onMessage);
+        sock.send('hello');
+
+        function onMessage(msg) {
+            setTimeout(expectClosed, 50);
+        }
+
+        function expectClosed() {
+            server.once('message', onSecondMessage);
+            sock.send('jello');
+        }
+
+        function onSecondMessage(msg) {
+            server.close();
+
+            var str = String(msg);
+            assert.equal(str, 'jello\n');
+            assert.end();
+        }
+    });
+});
+
+test('continues using dns resolver after socket timeout', function t(assert) {
+    var server = UDPServer({ port: PORT }, function onBound() {
+        var sock = new EphemeralSocket({
+            host: 'localhost',
+            port: PORT,
+            socket_timeout: 10,
+            packetQueue: { flush: 10 }
+        });
+        sock.resolveDNS({});
+
+        server.once('message', onMessage);
+        sock.send('hello');
+
+        function onMessage(msg) {
+            assert.notok(sock._dnsResolver._destroyed);
+            setTimeout(expectClosed, 50);
+        }
+
+        function expectClosed() {
+            server.close();
+
+            assert.notok(sock._dnsResolver._destroyed);
+            assert.end();
+        }
+    });
+});
+
 test('writing to a bad host does not blow up', function t(assert) {
     var sock = new EphemeralSocket({
         host: 'lol.example.com',
