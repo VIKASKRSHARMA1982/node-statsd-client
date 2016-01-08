@@ -1,3 +1,5 @@
+'use strict';
+
 var test = require('tape');
 var isIPv4 = require('net').isIPv4;
 var process = require('process');
