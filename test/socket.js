@@ -6,7 +6,7 @@ var isIPv4 = require('net').isIPv4;
 var process = require('process');
 
 var UDPServer = require('./lib/udp-server.js');
-var EphemeralSocket = require('../lib/EphemeralSocket.js');
+var EphemeralSocket = require('../lib/ephemeral-socket.js');
 
 var PORT = 8125;
 
