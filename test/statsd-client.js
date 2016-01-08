@@ -393,7 +393,47 @@ test('can write with DNS resolver', function t(assert) {
             assert.end();
         });
     });
-})
+});
+
+test('dnsResolver only resolves once', function t(assert) {
+    var counter = 0;
+
+    var server = UDPServer({ port: PORT }, function onBound() {
+        var client = new StatsDClient({
+            dnsResolver: {
+                dns: {
+                    lookup: function (hostname, cb) {
+                        counter++;
+                        process.nextTick(function onTick() {
+                            cb(null, '127.0.0.1');
+                        });
+                    }
+                }
+            },
+            packetQueue: { flush: 10 }
+        });
+
+        var client1 = client.getChildClient('p1');
+        var client2 = client.getChildClient('p2');
+
+        setTimeout(function fini() {
+
+            client1.timing('foo', 42);
+            client2.timing('foo', 43);
+            server.once('message', function (msg) {
+                assert.equal(
+                    msg.toString(),
+                    'p1.foo:42|ms\np2.foo:43|ms\n'
+                );
+                assert.equal(counter, 1);
+
+                server.close();
+                client.close();
+                assert.end();
+            });
+        }, 50);
+    });
+});
 
 test('client.timing() with Date', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
