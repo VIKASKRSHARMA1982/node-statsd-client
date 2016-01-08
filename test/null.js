@@ -76,7 +76,7 @@ test('null.decrement()', function t(assert) {
         delta: -1,
         time: null
     });
-    
+
     c._buffer.deq();
     c.decrement('some.key2', 3);
 

@@ -74,7 +74,7 @@ test('PacketQueue#write flush', function(assert) {
 
     pq.write('123')
     pq.write('456')
-    
+
     setTimeout(function() {
         assert.equals(w, 1)
         assert.end();
