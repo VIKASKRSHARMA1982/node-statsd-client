@@ -4,12 +4,19 @@ var RingBuffer = require('ringbufferjs');
 
 module.exports = NullStatsd;
 
-function NullStatsd(capacity) {
+function NullStatsd(opts, _buffer) {
     if (!(this instanceof NullStatsd)) {
-        return new NullStatsd(capacity);
+        return new NullStatsd(opts, _buffer);
     }
+    opts = opts || {};
 
-    this._buffer = new RingBuffer(capacity || 50);
+    this._buffer = _buffer || new RingBuffer(opts.capacity || 50);
+
+    var prefix = opts.prefix;
+
+    this.prefix = prefix ?
+        (prefix[prefix.length - 1] === '.' ? prefix : prefix + '.') :
+        '';
 }
 
 function NullStatsdRecord(type, name, value, delta, time) {
@@ -27,17 +34,17 @@ proto._write = function _write(record) {
 };
 
 proto.gauge = function gauge(name, value) {
-    this._write(new NullStatsdRecord('g', name, value));
+    this._write(new NullStatsdRecord('g', this.prefix + name, value));
 };
 
 proto.counter = function counter(name, value) {
-    this._write(new NullStatsdRecord('c', name, null, value));
+    this._write(new NullStatsdRecord('c', this.prefix + name, null, value));
 };
 
 proto.increment = function increment(name, delta) {
     this._write(new NullStatsdRecord(
         'c',
-        name,
+        this.prefix + name,
         null,
         delta || 1
     ));
@@ -46,7 +53,7 @@ proto.increment = function increment(name, delta) {
 proto.decrement = function decrement(name, delta) {
     this._write(new NullStatsdRecord(
         'c',
-        name,
+        this.prefix + name,
         null,
         (-1 * Math.abs(delta || 1))
     ));
@@ -55,7 +62,7 @@ proto.decrement = function decrement(name, delta) {
 proto.timing = function timing(name, time) {
     this._write(new NullStatsdRecord(
         'ms',
-        name,
+        this.prefix + name,
         null,
         null,
         time
@@ -71,7 +78,7 @@ proto.close = function close() {
 proto.immediateGauge = function (name, value, cb) {
     this._write(new NullStatsdRecord(
         'g',
-        name,
+        this.prefix + name,
         value
     ));
     process.nextTick(cb);
@@ -80,7 +87,7 @@ proto.immediateGauge = function (name, value, cb) {
 proto.immediateIncrement = function (name, delta, cb) {
     this._write(new NullStatsdRecord(
         'c',
-        name,
+        this.prefix + name,
         null,
         delta || 1
     ));
@@ -90,7 +97,7 @@ proto.immediateIncrement = function (name, delta, cb) {
 proto.immediateDecrement = function (name, delta, cb) {
     this._write(new NullStatsdRecord(
         'c',
-        name,
+        this.prefix + name,
         null,
         (-1 * Math.abs(delta || 1))
     ));
@@ -100,7 +107,7 @@ proto.immediateDecrement = function (name, delta, cb) {
 proto.immediateCounter = function (name, value, cb) {
     this._write(new NullStatsdRecord(
         'c',
-        name,
+        this.prefix + name,
         null,
         value
     ));
@@ -110,7 +117,7 @@ proto.immediateCounter = function (name, value, cb) {
 proto.immediateTiming = function (name, time, cb) {
     this._write(new NullStatsdRecord(
         'ms',
-        name,
+        this.prefix + name,
         null,
         null,
         time
@@ -118,7 +125,8 @@ proto.immediateTiming = function (name, time, cb) {
     process.nextTick(cb);
 };
 
-proto.getChildClient = function() {
-    return new NullStatsd(this._buffer.capacity());
+proto.getChildClient = function(extraPrefix) {
+    return new NullStatsd({
+        prefix: this.prefix + extraPrefix
+    }, this._buffer);
 };
-
