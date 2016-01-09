@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git://github.com/uber/node-statsd-client.git"
   },
-  "main": "lib/statsd-client.js",
+  "main": "./statsd.js",
   "scripts": {
     "test": "node test/index.js",
     "cover": "istanbul cover --print detail --report html test/index.js",

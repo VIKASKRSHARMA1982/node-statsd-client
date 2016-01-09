@@ -5,9 +5,9 @@ Node.js client for [statsd](https://github.com/etsy/statsd).
 ## Example
 
 ```js
-var Statsd = require('uber-statsd-client');
+var createStatsd = require('uber-statsd-client');
 
-var sdc = new Statsd({
+var sdc = createStatsd({
     host: 'statsd.example.com'
 });
 
@@ -22,8 +22,8 @@ sdc.close(); // Optional - stop NOW
 ## Docs
 
 ```js
-var SDC = require('uber-statsd-client')
-var sdc = new SDC({
+var createStatsd = require('uber-statsd-client')
+var sdc = createStatsd({
     host: 'statsd.example.com',
     port: 8124
 });
@@ -203,7 +203,7 @@ The library supports getting "child" clients with extra prefixes, to help with
 making sane name-spacing in apps:
 
     // Create generic client
-    var sdc = new StatsDClient({host: 'statsd.example.com', prefix: 'systemname');
+    var sdc = createSDC({host: 'statsd.example.com', prefix: 'systemname');
 	sdc.increment('foo'); // Increments 'systemname.foo'
 	... do great stuff ...
 
