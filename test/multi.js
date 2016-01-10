@@ -53,13 +53,19 @@ test('first callback error is surfaced', function t(assert) {
         return cb(new Error('oops'));
     }
 
+    var callbackCount = 0;
     var clients = [
+        new MockClient(),
+        new MockClient(),
         new MockClient()
     ];
     var multiClient = createMultiStatsd(clients);
     multiClient.immediateIncrement('foo', 1, onImmediateIncrement);
 
     function onImmediateIncrement(err) {
+        assert.strictEqual(callbackCount, 0);
+        callbackCount++;
+
         assert.ok(err);
         assert.strictEqual(err.message, 'oops');
         assert.end();
