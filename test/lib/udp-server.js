@@ -1,3 +1,5 @@
+'use strict';
+
 var dgram = require('dgram');
 
 module.exports = UDPServer;

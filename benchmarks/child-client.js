@@ -1,4 +1,4 @@
-var SDC = require('../lib/statsd-client.js');
+var SDC = require('../statsd.js');
 
 var client = new SDC({
     prefix: 'bar'

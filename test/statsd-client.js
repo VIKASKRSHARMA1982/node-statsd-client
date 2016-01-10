@@ -1,14 +1,16 @@
+'use strict';
+
 var test = require('tape');
 var setTimeout = require('timers').setTimeout;
 
 var UDPServer = require('./lib/udp-server.js');
-var StatsDClient = require('../lib/statsd-client.js');
+var StatsdClient = require('../statsd.js');
 
 var PORT = 8125;
 
 test('can write gauge to client', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             host: 'localhost',
             port: PORT,
             packetQueue: { flush: 10 }
@@ -28,7 +30,7 @@ test('can write gauge to client', function t(assert) {
 test('respects isDisabled', function t(assert) {
     var isDisabledBool = false;
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             host: 'localhost',
             port: PORT,
             packetQueue: { flush: 10 },
@@ -78,7 +80,7 @@ test('respects isDisabled', function t(assert) {
 
 test('can write timing to client', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             host: 'localhost',
             port: PORT,
             packetQueue: { flush: 10 }
@@ -97,7 +99,7 @@ test('can write timing to client', function t(assert) {
 
 test('can write with prefix', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             prefix: 'bar',
             packetQueue: { flush: 10 }
         });
@@ -115,7 +117,7 @@ test('can write with prefix', function t(assert) {
 
 test('can write with prefix trailing dot', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             prefix: 'bar.',
             packetQueue: { flush: 10 }
         });
@@ -133,7 +135,7 @@ test('can write with prefix trailing dot', function t(assert) {
 
 test('can write with child prefix', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             prefix: 'bar.',
             packetQueue: { flush: 10 }
         });
@@ -154,7 +156,7 @@ test('can write with child prefix', function t(assert) {
 
 test('can write counter to client', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient();
+        var client = new StatsdClient();
 
         client.timing('foo', 42);
         client._ephemeralSocket._queue._sendPacket();
@@ -170,7 +172,7 @@ test('can write counter to client', function t(assert) {
 
 test('client.counter()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT,
             packetQueue: { flush: 10 }
@@ -192,7 +194,7 @@ test('client.counter()', function t(assert) {
 
 test('client.increment()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT,
             packetQueue: { flush: 10 }
@@ -214,7 +216,7 @@ test('client.increment()', function t(assert) {
 
 test('client.decrement()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT,
             packetQueue: { flush: 10 }
@@ -236,7 +238,7 @@ test('client.decrement()', function t(assert) {
 
 test('client.gauge()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT,
             packetQueue: { flush: 10 }
@@ -258,7 +260,7 @@ test('client.gauge()', function t(assert) {
 
 test('client.immediateCounter()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT
         });
@@ -282,7 +284,7 @@ test('client.immediateCounter()', function t(assert) {
 
 test('client.immediateIncrement()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT
         });
@@ -306,7 +308,7 @@ test('client.immediateIncrement()', function t(assert) {
 
 test('client.immediateDecrement()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT
         });
@@ -330,7 +332,7 @@ test('client.immediateDecrement()', function t(assert) {
 
 test('client.immediateGauge()', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var sock = new StatsDClient({
+        var sock = new StatsdClient({
             host: 'localhost',
             port: PORT
         });
@@ -355,7 +357,7 @@ test('client.immediateGauge()', function t(assert) {
 
 test('client.immediateTiming() with Date', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             prefix: 'bar'
         });
 
@@ -379,7 +381,7 @@ test('client.immediateTiming() with Date', function t(assert) {
 
 test('can write with DNS resolver', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             dnsResolver: {},
             packetQueue: { flush: 10 }
         });
@@ -399,7 +401,7 @@ test('dnsResolver only resolves once', function t(assert) {
     var counter = 0;
 
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             dnsResolver: {
                 dns: {
                     lookup: function (hostname, cb) {
@@ -437,7 +439,7 @@ test('dnsResolver only resolves once', function t(assert) {
 
 test('client.timing() with Date', function t(assert) {
     var server = UDPServer({ port: PORT }, function onBound() {
-        var client = new StatsDClient({
+        var client = new StatsdClient({
             prefix: 'bar',
             packetQueue: { flush: 10 }
         });

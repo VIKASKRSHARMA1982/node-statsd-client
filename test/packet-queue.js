@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+'use strict';
 
 var test = require('tape');
 var process = require('process');
@@ -73,7 +74,7 @@ test('PacketQueue#write flush', function(assert) {
 
     pq.write('123')
     pq.write('456')
-    
+
     setTimeout(function() {
         assert.equals(w, 1)
         assert.end();

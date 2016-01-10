@@ -1,3 +1,5 @@
+'use strict';
+
 var test = require('tape');
 var isIPv4 = require('net').isIPv4;
 var process = require('process');
@@ -101,7 +103,7 @@ test('can close a DNS resolver after DNS', function t(assert) {
     function close() {
         var hostname = resolver.resolveHost('some-key');
         assert.equal(hostname, FAKE_HOST);
-        
+
         resolver.close();
         assert.end();
     }
@@ -164,7 +166,7 @@ test('Calls dns.resolve on interval', function t(assert) {
         assert.equal(counter, 3);
         var hostname = resolver.resolveHost('some-key');
         assert.equal(hostname, '0.0.0.3');
-        
+
         resolver.close();
         assert.end();
     }

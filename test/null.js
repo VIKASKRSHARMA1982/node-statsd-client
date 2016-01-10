@@ -2,10 +2,38 @@
 
 var test = require('tape');
 
-var NullStatsd = require('../null.js');
+var createNullStatsd = require('../null.js');
+
+test('null statsd capacity option back compat', function t(assert) {
+    var c = createNullStatsd(123);
+    assert.strictEqual(c._buffer.capacity(), 123);
+    c.close();
+    assert.end();
+});
+
+test('null statsd has a statsd compatible interface', function t(assert) {
+    var c = createNullStatsd({
+        capacity: 456,
+        prefix: 'a.b'
+    });
+
+    c.gauge('some.key', 10);
+
+    assert.strictEqual(c._buffer.capacity(), 456);
+    assert.deepEqual(c._buffer.peek(), {
+        type: 'g',
+        name: 'a.b.some.key',
+        value: 10,
+        delta: null,
+        time: null
+    });
+    c.close();
+
+    assert.end();
+});
 
 test('null.gauge()', function t(assert) {
-    var c = NullStatsd();
+    var c = createNullStatsd();
     c.gauge('some.key', 10);
 
     assert.deepEqual(c._buffer.peek(), {
@@ -21,7 +49,7 @@ test('null.gauge()', function t(assert) {
 });
 
 test('null.counter()', function t(assert) {
-    var c = NullStatsd();
+    var c = createNullStatsd();
     c.counter('some.key', 5);
 
     assert.deepEqual(c._buffer.peek(), {
@@ -37,7 +65,7 @@ test('null.counter()', function t(assert) {
 });
 
 test('null.increment()', function t(assert) {
-    var c = NullStatsd();
+    var c = createNullStatsd();
 
     c.increment('some.key');
 
@@ -65,7 +93,7 @@ test('null.increment()', function t(assert) {
 });
 
 test('null.decrement()', function t(assert) {
-    var c = NullStatsd();
+    var c = createNullStatsd();
 
     c.decrement('some.key');
 
@@ -76,7 +104,7 @@ test('null.decrement()', function t(assert) {
         delta: -1,
         time: null
     });
-    
+
     c._buffer.deq();
     c.decrement('some.key2', 3);
 
@@ -104,7 +132,7 @@ test('null.decrement()', function t(assert) {
 });
 
 test('null.timing()', function t(assert) {
-    var c = NullStatsd();
+    var c = createNullStatsd();
 
     c.timing('some.key', 500);
 
