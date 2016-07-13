@@ -8,7 +8,7 @@
     "metrics",
     "udp"
   ],
-  "version": "1.7.1",
+  "version": "1.7.2",
   "homepage": "https://github.com/uber/node-statsd-client",
   "bugs": "https://github.com/uber/node-statsd-client/issues",
   "repository": {
