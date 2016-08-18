@@ -19,6 +19,11 @@ sdc.timing('some.timer', timer); // Calculates time diff
 sdc.close(); // Optional - stop NOW
 ```
 
+## Caveats
+
+Apparently a `udp` based statsd client does not work with `cluster` in node0.10 or node0.12.
+I'd recommend finding a `tcp` based statsd client or not using `cluster`.
+
 ## Docs
 
 ```js
